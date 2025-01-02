@@ -4,7 +4,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Simple Advice App by Shafiq Mustapa</title>
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
@@ -19,7 +19,7 @@
         }
 
         h1 {
-            text-shadow: 5px 5px #efefef;
+            text-shadow: 5px 5px #000000;
         }
         .fullheight {
             height: 90vh;
@@ -28,6 +28,9 @@
 
   </head>
   <body>
+    <div class="pull-to-refresh">
+        <div class="spinner-border"></div>
+      </div>
     <div class="content">
         <div class="text-center">
             <button onclick="getAdvice()" class="btn btn-lg btn-primary align-items-center"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
@@ -41,9 +44,31 @@
         
     </div>
     
-    
-        
     <script>
+        // first time load, will also load wallpaper and advice
+
+        window.onload = function() {
+            fetch('https://picsum.photos/1920/1080/?blur=2') // Size can be adjusted
+            .then(response => {
+                // Ensure successful fetch
+                if (response.ok) {
+                    document.body.style.backgroundImage = `url(${response.url})`;
+                }
+            })
+            .catch(error => console.error('Error loading the image:', error));
+            
+            // Fetch advice
+            fetch("https://api.adviceslip.com/advice")
+            .then(response => response.json())
+            .then(data => {
+                //console.log('Success:', data.slip.advice);
+                let advice = data.slip.advice;
+                document.getElementById("canvasAdvice").innerHTML = advice;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
         function getAdvice() {
             // fetch wallpaper
             
@@ -68,6 +93,26 @@
                 console.error('Error:', error);
             });
         }
+
+        const pullToRefresh = document.querySelector('.pull-to-refresh');
+        let touchstartY = 0;
+        document.addEventListener('touchstart', e => {
+        touchstartY = e.touches[0].clientY;
+        });
+        document.addEventListener('touchmove', e => {
+        const touchY = e.touches[0].clientY;
+        const touchDiff = touchY - touchstartY;
+        if (touchDiff > 0 && window.scrollY === 0) {
+            pullToRefresh.classList.add('visible');
+            e.preventDefault();
+        }
+        });
+        document.addEventListener('touchend', e => {
+        if (pullToRefresh.classList.contains('visible')) {
+            pullToRefresh.classList.remove('visible');
+            location.reload();
+        }
+        });
     </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
