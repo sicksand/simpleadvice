@@ -27,10 +27,11 @@
         z-index: 10;
       }
     </style>
+    <title>Simple Advice by Shafiq Mustapa</title>
   </head>
   <body>
     <div class="content pull-to-refresh">
-      <button class="btn btn-primary share-button" id="shareButton">Share</button>
+      <button class="btn btn-dark share-button" id="shareButton"><i class="bi bi-share"></i> Share</button>
       <div class="d-flex justify-content-center align-items-center fullheight">
         <h1 id="canvasAdvice" class="text-center text-white">The hardest things to say are usually the most important.</h1>
       </div>
@@ -94,7 +95,7 @@
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             navigator.share({
               title: 'Advice',
-              text: 'Check out this advice!',
+              text: 'Check out this advice! Simple Advice by Shafiq Mustapa - https://simpleadvice.pages.dev',
               files: [file],
             }).then(() => {
               console.log('Thanks for sharing!');
