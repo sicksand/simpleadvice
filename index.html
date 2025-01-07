@@ -91,7 +91,8 @@
         html2canvas(document.body).then(canvas => {
           canvas.toBlob(blob => {
             const file = new File([blob], 'screenshot.png', { type: 'image/png' });
-            if (navigator.share) {
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
               navigator.share({
                 title: 'Advice',
                 text: 'Check out this advice!',
@@ -100,8 +101,9 @@
                 console.log('Thanks for sharing!');
               }).catch((error) => console.error('Error sharing:', error));
             } else {
-              alert('Web Share API is not supported in your browser.');
+              alert('Web Share API is not supported in your browser or does not support sharing files.');
             }
+
             shareButton.style.display = 'block';
           }, 'image/png');
         }).catch(error => {
