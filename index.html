@@ -36,7 +36,7 @@
       </div>
     </div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
     <script>
       window.onload = loadContent;
       
@@ -88,24 +88,22 @@
         const shareButton = document.getElementById("shareButton");
         shareButton.style.display = 'none';
 
-        html2canvas(document.body).then(canvas => {
-          canvas.toBlob(blob => {
-            const file = new File([blob], 'screenshot.png', { type: 'image/png' });
+        domtoimage.toBlob(document.body).then(blob => {
+          const file = new File([blob], 'screenshot.png', { type: 'image/png' });
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-              navigator.share({
-                title: 'Advice',
-                text: 'Check out this advice!',
-                files: [file],
-              }).then(() => {
-                console.log('Thanks for sharing!');
-              }).catch((error) => console.error('Error sharing:', error));
-            } else {
-              alert('Web Share API is not supported in your browser or does not support sharing files.');
-            }
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({
+              title: 'Advice',
+              text: 'Check out this advice!',
+              files: [file],
+            }).then(() => {
+              console.log('Thanks for sharing!');
+            }).catch((error) => console.error('Error sharing:', error));
+          } else {
+            alert('Web Share API is not supported in your browser or does not support sharing files.');
+          }
 
-            shareButton.style.display = 'block';
-          }, 'image/png');
+          shareButton.style.display = 'block';
         }).catch(error => {
           console.error('Error taking screenshot:', error);
           shareButton.style.display = 'block';
