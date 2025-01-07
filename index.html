@@ -1,118 +1,103 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
-        body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            background-size: cover;
-            background-position: center;
-        }
-
-        h1 {
-            text-shadow: 5px 5px #000000;
-        }
-        .fullheight {
-            height: 90vh;
-    }
+      body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        background-size: cover;
+        background-position: center;
+      }
+      h1 {
+        text-shadow: 5px 5px #000000;
+      }
+      .fullheight {
+        height: 90vh;
+      }
+      .share-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+      }
     </style>
-
   </head>
   <body>
     <div class="content pull-to-refresh">
-        <div class="d-flex justify-content-center align-items-center fullheight">
-            <h1 id="canvasAdvice" class="text-center text-white">The hardest things to say are usually the most important.</h1>
-            
-        </div>
-        
+      <button class="btn btn-primary share-button" id="shareButton">Share</button>
+      <div class="d-flex justify-content-center align-items-center fullheight">
+        <h1 id="canvasAdvice" class="text-center text-white">The hardest things to say are usually the most important.</h1>
+      </div>
     </div>
     
     <script>
-        // first time load, will also load wallpaper and advice
+      window.onload = loadContent;
+      
+      function loadContent() {
+        fetch('https://picsum.photos/1920/1080/?blur=2')
+          .then(response => {
+            if (response.ok) {
+              document.body.style.backgroundImage = `url(${response.url})`;
+            }
+          })
+          .catch(error => console.error('Error loading the image:', error));
+        
+        fetch("https://api.adviceslip.com/advice")
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById("canvasAdvice").innerHTML = data.slip.advice;
+          })
+          .catch(error => console.error('Error fetching advice:', error));
+      }
 
-        window.onload = function() {
-            fetch('https://picsum.photos/1920/1080/?blur=2') // Size can be adjusted
-            .then(response => {
-                // Ensure successful fetch
-                if (response.ok) {
-                    document.body.style.backgroundImage = `url(${response.url})`;
-                }
-            })
-            .catch(error => console.error('Error loading the image:', error));
-            
-            // Fetch advice
-            fetch("https://api.adviceslip.com/advice")
-            .then(response => response.json())
-            .then(data => {
-                //console.log('Success:', data.slip.advice);
-                let advice = data.slip.advice;
-                document.getElementById("canvasAdvice").innerHTML = advice;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-        function getAdvice() {
-            // fetch wallpaper
-            
-            fetch('https://picsum.photos/1920/1080/?blur=2') // Size can be adjusted
-            .then(response => {
-                // Ensure successful fetch
-                if (response.ok) {
-                    document.body.style.backgroundImage = `url(${response.url})`;
-                }
-            })
-            .catch(error => console.error('Error loading the image:', error));
-            
-            // Fetch advice
-            fetch("https://api.adviceslip.com/advice")
-            .then(response => response.json())
-            .then(data => {
-                //console.log('Success:', data.slip.advice);
-                let advice = data.slip.advice;
-                document.getElementById("canvasAdvice").innerHTML = advice;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
+      const pullToRefresh = document.querySelector('.pull-to-refresh');
+      let touchstartY = 0;
 
-        const pullToRefresh = document.querySelector('.pull-to-refresh');
-        let touchstartY = 0;
-        document.addEventListener('touchstart', e => {
+      document.addEventListener('touchstart', e => {
         touchstartY = e.touches[0].clientY;
-        });
-        document.addEventListener('touchmove', e => {
+      });
+
+      document.addEventListener('touchmove', e => {
         const touchY = e.touches[0].clientY;
         const touchDiff = touchY - touchstartY;
         if (touchDiff > 0 && window.scrollY === 0) {
-            pullToRefresh.classList.add('visible');
-            e.preventDefault();
+          pullToRefresh.classList.add('visible');
+          e.preventDefault();
         }
-        });
-        document.addEventListener('touchend', e => {
-        if (pullToRefresh.classList.contains('visible')) {
-            pullToRefresh.classList.remove('visible');
-            location.reload();
-        }
-        });
-      // reload every 5 minutes
-      setInterval(function() {
-          location.reload();
-      }, 5 * 60 * 1000); // 5 minutes = 5 * 60 * 1000 milliseconds
+      });
 
+      document.addEventListener('touchend', () => {
+        if (pullToRefresh.classList.contains('visible')) {
+          pullToRefresh.classList.remove('visible');
+          location.reload();
+        }
+      });
+
+      setInterval(() => {
+        location.reload();
+      }, 5 * 60 * 1000); // 5 minutes
+
+      document.getElementById("shareButton").addEventListener("click", () => {
+        if (navigator.share) {
+          navigator.share({
+            title: 'Advice',
+            text: document.getElementById("canvasAdvice").innerText,
+            url: window.location.href
+          }).then(() => {
+            console.log('Thanks for sharing!');
+          }).catch((error) => console.error('Error sharing:', error));
+        } else {
+          alert('Web Share API is not supported in your browser.');
+        }
+      });
     </script>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
