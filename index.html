@@ -38,6 +38,7 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+    <script src="https://unpkg.com/compromise@13.0.0/builds/compromise.min.js"></script>
     <script>
       window.onload = loadContent;
       
@@ -53,7 +54,18 @@
         fetch("https://api.adviceslip.com/advice")
           .then(response => response.json())
           .then(data => {
-            document.getElementById("canvasAdvice").innerHTML = data.slip.advice;
+            let advice = data.slip.advice;
+            let nlp = window.nlp;
+            let doc = nlp(advice);
+            let verbs = doc.verbs().out('array');
+            console.log('Detected verb(s):', verbs);
+
+            verbs.forEach(verb => {
+              const regex = new RegExp(`\\b${verb}\\b`, 'gi');
+              advice = advice.replace(regex, `<i>${verb}</i>`);
+            });
+
+            document.getElementById("canvasAdvice").innerHTML = advice;
           })
           .catch(error => console.error('Error fetching advice:', error));
       }
