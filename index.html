@@ -57,10 +57,10 @@
             let advice = data.slip.advice;
             let nlp = window.nlp;
             let doc = nlp(advice);
-            let verbs = doc.verbs().out('array');
-            console.log('Detected verb(s):', verbs);
+            let nouns = doc.nouns().out('array');
+            console.log('Detected noun(s):', nouns);
 
-            verbs.forEach(verb => {
+            nouns.forEach(noun => {
               const regex = new RegExp(`\\b${verb}\\b`, 'gi');
               advice = advice.replace(regex, `<i>${verb}</i>`);
             });
