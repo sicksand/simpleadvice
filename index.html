@@ -61,8 +61,8 @@
             console.log('Detected noun(s):', nouns);
 
             nouns.forEach(noun => {
-              const regex = new RegExp(`\\b${verb}\\b`, 'gi');
-              advice = advice.replace(regex, `<i>${verb}</i>`);
+              const regex = new RegExp(`\\b${noun}\\b`, 'gi');
+              advice = advice.replace(regex, `<i>${noun}</i>`);
             });
 
             document.getElementById("canvasAdvice").innerHTML = advice;
