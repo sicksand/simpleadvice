@@ -43,7 +43,7 @@
       window.onload = loadContent;
       
       function loadContent() {
-        fetch('https://picsum.photos/1920/1080/?blur=2')
+        fetch('https://picsum.photos/1920/1080/')
           .then(response => {
             if (response.ok) {
               document.body.style.backgroundImage = `url(${response.url})`;
